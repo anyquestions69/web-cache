@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  trafficserver:
+    build: ./ats
+    container_name: trafficserver
+    ports:
+      - "8080:8080"  # Порт для входящего трафика
+      - "8081:8081"  # Порт для администрирования (если нужно)
+    networks:
+      - dmz
+      - private
+
+  node-app:
+    build: ./node-app
+    container_name: node-app
+    ports:
+      - "3000:3000"  # Порт Node.js приложения (для отладки)
+    environment:
+      - NODE_ENV=production
+    networks:
+      - private
+
+networks:
+  dmz:
+    driver: bridge
+  private:
+    driver: bridge
+    internal: true
