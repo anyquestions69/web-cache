@@ -28,7 +28,7 @@ RUN git clone https://github.com/apache/trafficserver.git /ats-src
 WORKDIR /ats-src
 
 # Выбираем версию (например, 9.2.x)
-RUN git checkout 9.2.x
+RUN git checkout 9.0.x
 
 # Собираем и устанавливаем ATS
 RUN autoreconf -if && \
