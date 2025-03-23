@@ -27,6 +27,7 @@ services:
     restart: unless-stopped
     networks:
       - dmz
+      - private
   node-app:
     build: ./node-app
     container_name: node-app
