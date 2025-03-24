@@ -5,7 +5,7 @@ services:
     build: ./ats
     container_name: trafficserver
     ports:
-      - "8080:8080"  # Порт для входящего трафика
+      - "9888:8080"  # Порт для входящего трафика
       - "8081:8081"  # Порт для администрирования (если нужно)
     networks:
       - dmz
@@ -37,6 +37,35 @@ services:
       - NODE_ENV=production
     networks:
       - private
+  panos-emulator:
+    image: python:3.9-slim
+    container_name: panos-emulator
+    ports:
+      - "5443:443"  # HTTPS для API
+    volumes:
+      - ./panos_scripts:/app
+    working_dir: /app
+    command: >
+      sh -c "pip install pan-os-python && 
+             python main.py"
+    networks:
+      - dmz
+      - private
+  minio:
+    image: minio/minio:RELEASE.2024-01-28T22-35-53Z # Конкретная версия
+    container_name: minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ACCESS_KEY: supersecret  # Логин по умолчанию
+      MINIO_SECRET_KEY: supersecret # Пароль по умолчанию
+    volumes:
+      - minio_data:/data  # Хранение данных
+    ports:
+      - "9000:9000"  # API (S3)
+      - "9001:9001"  # Веб-консоль
+    networks:
+      - dmz
+    restart: unless-stopped
 
 networks:
   dmz:
@@ -44,3 +73,6 @@ networks:
   private:
     driver: bridge
     internal: true
+
+volumes:
+  minio_data:
