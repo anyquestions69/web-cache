@@ -7,6 +7,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Устанавливаем зависимости для сборки ATS
 RUN apt-get update && \
     apt-get install -y \
+    needrestart \
     curl \
     build-essential \
     libssl-dev \
