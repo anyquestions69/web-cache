@@ -20,27 +20,15 @@ RUN apt-get update && \
     pkg-config \
     tzdata && \ 
     ln -fs /usr/share/zoneinfo/UTC /etc/localtime && \  
-    dpkg-reconfigure --frontend noninteractive tzdata  
+    dpkg-reconfigure --frontend noninteractive tzdata  \
+    trafficserver
 
-# Клонируем исходный код Apache Traffic Server
-RUN git clone https://github.com/apache/trafficserver.git /ats-src
 
-# Переходим в директорию с исходным кодом
-WORKDIR /ats-src
-
-# Выбираем версию (например, 9.2.x)
-RUN git checkout 9.0.x
-
-# Собираем и устанавливаем ATS
-RUN autoreconf -if && \
-    ./configure --prefix=/opt/ats && \
-    make && \
-    make install
 
 # Копируем конфигурационные файлы (если есть)
 COPY records.config /opt/ats/etc/trafficserver/records.config
 COPY remap.config /opt/ats/etc/trafficserver/remap.config
-
+COPY cache.config /opt/ats/etc/trafficserver/cache.config
 # Открываем порты для ATS
 EXPOSE 8080  
 EXPOSE 8081  

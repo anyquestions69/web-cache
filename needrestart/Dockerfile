@@ -10,4 +10,4 @@ RUN apt-get update && \
     needrestart -b -r a || true  # Игнорировать ошибки
 
 EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["needrestart"]
