@@ -12,21 +12,53 @@ services:
     networks:
       - dmz
       - private
-
-
-  webserver:
-    image: php:8.2-apache
-    container_name: apache-php
-    ports:
-      - "80:80"
-    volumes:
-      - ./src:/var/www/html
-    #  - ./apache-config:/etc/apache2/sites-available
+  db:
+    image: mysql:8.0
+    container_name: wordpress_db
+    restart: always
     environment:
-      APACHE_DOCUMENT_ROOT: /var/www/html
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress_password
+    volumes:
+      - db_data:/var/lib/mysql
     networks:
       - private
-    restart: unless-stopped
+
+  # WordPress (PHP + Apache)
+  wordpress:
+    image: wordpress:latest
+    container_name: wordpress_app
+    restart: always
+    depends_on:
+      - db
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress_password
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - ./wordpress_data:/var/www/html
+    ports:
+      - "8000:80"
+    networks:
+      - dmz
+      - private
+
+  # webserver:
+  #   image: php:8.2-apache
+  #   container_name: apache-php
+  #   ports:
+  #     - "80:80"
+  #   volumes:
+  #     - ./src:/var/www/html
+  #   #  - ./apache-config:/etc/apache2/sites-available
+  #   environment:
+  #     APACHE_DOCUMENT_ROOT: /var/www/html
+  #   networks:
+  #     - private
+  #   restart: unless-stopped
 
 networks:
   dmz:
@@ -37,3 +69,4 @@ networks:
 
 volumes:
   minio_data:
+  db_data:
